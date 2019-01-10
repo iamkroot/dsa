@@ -1,5 +1,8 @@
 *.out
+!**/Tests/**/*.out
 *.in
+!**/Tests/**/*.in
 *.o
 main
+main.c
 .vscode/**
