@@ -59,6 +59,7 @@ def test_file(filepath: Path, testfile=None):
         if expected_output != actual_output:
             print("Failed for test case ", input_file)
             print_diff(expected_output, actual_output)
+    build_obj.unlink()
 
 
 def main():
