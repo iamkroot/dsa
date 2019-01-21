@@ -38,14 +38,11 @@ def print_diff(texta: str, textb: str):
 
 
 def test_file(filepath: Path, testfile=None):
+    tests_dir = get_tests_dir(testfile or filepath)
+    if not tests_dir:
+        return
     build_obj = compile(filepath)
     if not build_obj:
-        return
-    if testfile:
-        tests_dir = get_tests_dir(testfile)
-    else:
-        tests_dir = get_tests_dir(filepath)
-    if not tests_dir:
         return
     test_files = list(tests_dir.iterdir())
     input_files = filter(lambda x: x.suffix == ".in", test_files)
@@ -67,7 +64,7 @@ def main():
     parser.add_argument("paths", nargs="*")
     args = parser.parse_args()
     if not args.paths:
-        args.paths = list(Path('.').glob("**/*.c"))
+        args.paths = list(Path('.').rglob("*.c"))
 
     for path in args.paths:
         path = Path(path)
@@ -75,7 +72,7 @@ def main():
         if not path.exists():
             return
         if path.is_dir():
-            args.paths += path.glob("**/*.c")
+            args.paths += path.rglob("*.c")
             continue
         if path.stem == 'main':
             with open(path) as f:
