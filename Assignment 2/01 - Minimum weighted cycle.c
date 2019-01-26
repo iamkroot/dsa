@@ -25,7 +25,7 @@ void prlist(node* head) {
 }
 
 int adj[1000][1000], visited[1000];
-int n, m;
+int n;
 
 void dfs(int start, int v, int cur_weight) {
     prepend(&cur_path_start, v);
@@ -50,7 +50,7 @@ void dfs(int start, int v, int cur_weight) {
 }
 
 void main() {
-    scanf("%d %d", &n, &m);
+    scanf("%d", &n);
     for (int i = 0; i < n; i++) {
         visited[i] = 0;
         for (int j = 0; j < n; j++) {
@@ -58,10 +58,9 @@ void main() {
         }
     }
 
-    for (int i = 0; i < m; i++) {
-        int a, b, c;
-        scanf("%d %d %d", &a, &b, &c);
-        adj[a][b] = c;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++)
+            scanf("%d ", &adj[i][j]);
     }
     for (int i = 0; i < n; i++) {
         dfs(i, i, 0);
