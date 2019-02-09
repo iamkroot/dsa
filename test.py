@@ -18,7 +18,7 @@ def get_tests_dir(filepath):
     return tests_dir
 
 
-def compile(filepath: Path):
+def compile_file(filepath: Path):
     if not filepath.suffix == '.c':
         return
     filepath = filepath.resolve()
@@ -37,16 +37,16 @@ def print_diff(texta: str, textb: str):
     print(*list(diff))
 
 
-def test_file(filepath: Path, testfile=None):
+def run_tests(filepath: Path, testfile=None):
     tests_dir = get_tests_dir(testfile or filepath)
     if not tests_dir:
         return
-    build_obj = compile(filepath)
+    build_obj = compile_file(filepath)
     if not build_obj:
         return
     test_files = list(tests_dir.iterdir())
-    input_files = filter(lambda x: x.suffix == ".in", test_files)
-    output_files = filter(lambda x: x.suffix == ".out", test_files)
+    input_files = filter(lambda file: file.suffix == ".in", test_files)
+    output_files = filter(lambda file: file.suffix == ".out", test_files)
     for input_file, output_file in zip(input_files, output_files):
         with open(input_file) as inp:
             call = sp.run(str(build_obj), stdin=inp, capture_output=True)
@@ -70,7 +70,8 @@ def main():
         path = Path(path)
         testfile = None
         if not path.exists():
-            return
+            print(f"Path {path} not found.")
+            continue
         if path.is_dir():
             args.paths += path.rglob("*.c")
             continue
@@ -80,7 +81,7 @@ def main():
             if not line.startswith('//'):
                 continue
             testfile = Path(line[3:].strip())
-        test_file(path, testfile)
+        run_tests(path, testfile)
 
 
 if __name__ == "__main__":
