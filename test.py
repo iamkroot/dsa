@@ -44,6 +44,8 @@ def run_tests(filepath: Path, testfile=None):
     build_obj = compile_file(filepath)
     if not build_obj:
         return
+    print("Running tests for", filepath)
+    success = True
     test_files = list(tests_dir.iterdir())
     input_files = filter(lambda file: file.suffix == ".in", test_files)
     output_files = filter(lambda file: file.suffix == ".out", test_files)
@@ -54,26 +56,25 @@ def run_tests(filepath: Path, testfile=None):
         with open(output_file) as expected:
             expected_output = expected.read().strip('\r\n')
         if expected_output != actual_output:
-            print("Failed for test case ", input_file)
+            print("Failed for test case", input_file)
             print_diff(expected_output, actual_output)
+            success = False
     build_obj.unlink()
+    return success
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("paths", nargs="*")
-    args = parser.parse_args()
-    if not args.paths:
-        args.paths = list(Path('.').rglob("*.c"))
+def gather_files(paths):
+    if not paths:
+        paths = list(Path('.').rglob("*.c"))
 
-    for path in args.paths:
+    for path in paths:
         path = Path(path)
         testfile = None
         if not path.exists():
             print(f"Path {path} not found.")
             continue
         if path.is_dir():
-            args.paths += path.rglob("*.c")
+            paths += path.rglob("*.c")
             continue
         if path.stem == 'main':
             with open(path) as f:
@@ -81,7 +82,17 @@ def main():
             if not line.startswith('//'):
                 continue
             testfile = Path(line[3:].strip())
-        run_tests(path, testfile)
+        yield path, testfile
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("paths", nargs="*")
+    args = parser.parse_args()
+    files = list(gather_files(args.paths))
+    for path, testfile in files:
+        if run_tests(path, testfile):
+            print("All tests passed.")
 
 
 if __name__ == "__main__":
