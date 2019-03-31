@@ -1,15 +1,9 @@
 #include <limits.h>
 #include <stdio.h>
 
-typedef struct {
-    int arr_tm;
-    int proc_tm;
-} Order;
-
 int main() {
     int n;
     scanf("%d", &n);
-    Order orders[n];
     int arr_tm[n], proc_tm[n], total = 0;
     for (int i = 0; i < n; i++) {
         scanf("%d %d", &(arr_tm[i]), &(proc_tm[i]));
